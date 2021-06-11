@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: binary
-          path: main.go
+          path: main
 
 
   e2e:
@@ -52,7 +52,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: binary
-          path: main.go
+          path: main
 
       - name: Run crane
-        run: main.go export --export-dir /tmp
+        run: main export --export-dir /tmp
