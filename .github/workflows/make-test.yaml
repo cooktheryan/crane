@@ -55,4 +55,4 @@ jobs:
           path: main.go
 
       - name: Run crane
-        run: main export --export-dir /tmp
+        run: main.go export --export-dir /tmp
