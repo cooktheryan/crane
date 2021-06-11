@@ -1,0 +1,42 @@
+name: Make and Test
+on: 
+  push:
+    branches: ["main", "release*"]
+    tags: ["*"]
+  pull_request:
+    branches: ["main", "release*"]
+
+jobs:
+  make-binary-test:
+    name: Make and test 
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # There must be kindest/node images for these versions
+        # See: https://hub.docker.com/r/kindest/node/tags?page=1&ordering=name
+        # Or: skopeo list-tags docker://kindest/node
+        KUBERNETES_VERSIONS:
+          - "1.21.1"  # OCP 4.8
+    env:
+      GO_VERSION: "1.15"
+      KUBECONFIG: /tmp/kubeconfig
+      KUBERNETES_VERSION: ${{ matrix.KUBERNETES_VERSIONS }}
+
+    steps:
+      - name: Create k8s Kind Cluster
+        uses: engineerd/setup-kind@v0.5.0
+
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: build bin
+        run: go build main.go
+
+      - name: Run crane
+        run: main export --export-dir /tmp
